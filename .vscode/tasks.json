@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks":
+    [
+        {
+            "label": "Build configuration",
+            "type":  "shell",
+            "group": "build",
+            "windows":
+            {
+                "command": "mingw32-make",
+                "args":
+                [
+                    "SHELL=%COMSPEC%",
+                    "config=${command:cpptools.activeConfigName}"
+                ]
+            },
+            "presentation":
+            {
+                "panel":  "dedicated",
+                "reveal": "always",
+
+                "focus":             true,
+                "clear":             true,
+                "echo":              true,
+                "close":            false,
+                "showReuseMessage": false
+            },
+            "icon":
+            {
+                "id": "combine"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Remove configuration output directory",
+            "type":  "shell",
+            "group": "none",
+            "windows":
+            {
+                "command": "if exist \"out\\${command:cpptools.activeConfigName}\" rd /S /Q \"out\\${command:cpptools.activeConfigName}\""
+            },
+            "presentation":
+            {
+                "panel":  "shared",
+                "reveal": "never",
+
+                "focus":            false,
+                "clear":            false,
+                "echo":             false,
+                "close":            false,
+                "showReuseMessage": false
+            },
+            "icon":
+            {
+                "id": "trash"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

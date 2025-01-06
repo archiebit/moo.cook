@@ -1,0 +1,59 @@
+{
+    "version": 4,
+    "configurations":
+    [
+        {
+            "name":             "win-x64-rel",
+            "cStandard":        "c23",
+            "cppStandard":      "c++23",
+            "intelliSenseMode": "windows-clang-x64",
+            "includePath":
+            [
+                "${workspaceFolder}/inc"
+            ],
+            "compilerPath": "C:/msys64/clang64/bin/clang++.exe",
+            "compilerArgs":
+            [
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-std=c++23",
+                "-masm=intel",
+                "-m64"
+            ],
+            "browse":
+            {
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name":             "win-x64-dev",
+            "cStandard":        "c23",
+            "cppStandard":      "c++23",
+            "intelliSenseMode": "windows-clang-x64",
+            "includePath":
+            [
+                "${workspaceFolder}/inc"
+            ],
+            "compilerPath": "C:/msys64/clang64/bin/clang++.exe",
+            "compilerArgs":
+            [
+                "-O0",
+                "-ggdb",
+                "-Wall",
+                "-Wextra",
+                "-std=c++23",
+                "-masm=intel",
+                "-m64"
+            ],
+            "defines":
+            [
+                "DEVELOPMENT"
+            ],
+            "browse":
+            {
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ]
+}

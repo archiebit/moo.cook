@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations":
+    [
+        {
+            "name":    "Debug C++ program",
+            "type":    "cppdbg",
+            "request": "launch",
+            "cwd":     "${workspaceFolder}\\out\\${command:cpptools.activeConfigName}\\out\\bin",
+            "program": "${workspaceFolder}\\out\\${command:cpptools.activeConfigName}\\out\\bin\\${input:program}",
+            "args": [],
+
+            "miDebuggerPath": "gdb.exe",
+            "miDebuggerArgs": "",
+
+            "setupCommands":
+            [
+                { "text": "-enable-pretty-printing"           },
+                { "text": "-gdb-set disassembly-flavor intel" }
+            ]
+        }
+    ],
+    "inputs":
+    [
+        {
+            "id":          "program",
+            "description": "Choose an executable file",
+            "type":        "pickString",
+            "options": []
+        }
+    ]
+}

@@ -1,0 +1,109 @@
+#--- Functions -----------------------------------------------------------------
+#  Creates a "valid" file system path.
+define path
+$(foreach file,$1,"$(subst /,\,${file})")
+endef
+
+#  Creates an output folder for the target.
+define make-spot
+$(shell if not exist $(call path,$(dir $1)) md $(call path,$(dir $1)))
+endef
+
+#  Lists all source files for a target.
+define find-source
+$(patsubst src/$1/%.cc,%.cc,$(wildcard src/$1/*.cc))
+endef
+
+#  Lists all resource files for a target.
+define find-resource
+$(patsubst res/$1/%.rc,%.rc,$(wildcard res/$1/*.rc))
+endef
+
+#  Lists all object files for a target. I keep repeating myself >:(
+define find-object
+$(addprefix ${tmp}/$1/,$(patsubst %.cc,%.o,$(call find-source,$1)) $(patsubst %.rc,%.o,$(call find-resource,$1)))
+endef
+
+
+
+
+#--- Check configuration info --------------------------------------------------
+ifndef config
+$(error Configuration is undefined)
+else
+    ifneq '$(words $(subst -, ,${config}))' '3'
+    $(error Configuration must be in the format 'os-arch-mode')
+    endif
+endif
+
+
+
+
+#--- Template and generic stuff ------------------------------------------------
+#  This macro defines a new library target.
+define add-target-lib
+${lib}/$1: $(call find-object,$(notdir $1))
+	$$(call make-spot,$$@)
+	ar rc $$(call path,$$@) $$(call path,$$^)
+endef
+
+#  And this macro causes the creation of this target.
+define create-lib
+$(eval $(call add-target-lib,$1))
+endef
+
+
+define add-target-exe
+${bin}/$1: $(call find-object,$(notdir $1))
+	$$(call make-spot,$$@)
+	clang++ -o $$(call path,$$@) $$(call find-object,$$(notdir $$@)) $${libdirs} $${libs} $${tflags}
+endef
+
+define create-exe
+$(eval $(call add-target-exe,$1))
+endef
+
+
+define append-lib
+${bin}/$1:     libs    += $(addprefix -l ,$(call path,$2))
+endef
+
+define append-lib-dir
+${bin}/$1:     libdirs += $(addprefix -L ,$(call path,$2))
+endef
+
+define append-inc-dir
+${tmp}/$1/%.o: incdirs += $(addprefix -I ,$(call path,$2))
+endef
+
+define append-exe-flags
+${bin}/$1:     tflags  += $2
+endef
+
+define append-obj-flags
+${tmp}/$1/%.o: oflags  += $2
+endef
+
+
+
+
+#--- Setting variables ---------------------------------------------------------
+incdirs := $(addprefix -I ,$(call path,${incdirs}))
+libdirs := $(addprefix -L ,$(call path,${libdirs}))
+libs    := $(addprefix -l ,$(call path,${libs}))
+oflags  += ${incdirs}
+
+#  Position independent code for libraries.
+%.dll: oflags += -fPIC
+%.a:   oflags += -fPIC
+
+#  Adding some flags for different modes.
+#  -- Development mode.
+ifeq '$(word 3,$(subst -, ,${config}))' 'dev'
+oflags  += -O0 -ggdb -D DEVELOPMENT
+endif
+
+#  -- Release mode.
+ifeq '$(word 3,$(subst -, ,${config}))' 'rel'
+oflags  += -O2
+endif
