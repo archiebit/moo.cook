@@ -12,6 +12,10 @@ namespace moo
     public:
        ~recipe( ) = default;
         recipe( ) = default;
+
+
+    public:
+        std::map<std::wstring, std::wstring> cmds;
     };
 }
 
