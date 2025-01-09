@@ -139,6 +139,20 @@ namespace moo
         }
 
 
+        // Each recipe must have pattern.
+        if( not out.vars.contains( L"pattern" ) )
+        {
+            throw L"Recipe must have pattern variable.";
+        }
+
+
+        // Each recipe must have command.
+        if( not out.vars.contains( L"command" ) )
+        {
+            throw L"Recipe must have command variable.";
+        }
+
+
         return out;
     }
 }
