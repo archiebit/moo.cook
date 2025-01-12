@@ -27,9 +27,11 @@ include makefile-main
 
 #--- Configuration build list --------------------------------------------------
 ifeq '${config}' 'win-x64-dev'
+$(call create-exe,cook.exe)
 endif
 
 ifeq '${config}' 'win-x64-rel'
+$(call create-exe,cook.exe)
 endif
 
 
