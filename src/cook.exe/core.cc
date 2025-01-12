@@ -1,6 +1,109 @@
 #include <moo/core.hh>
 
 #include <regex>
+#include <filesystem>
+
+
+namespace moo
+{
+    void strip( std::wstring & value )
+    {
+        // Temp storage.
+        std::list<std::wstring> elements;
+
+
+        // Split line into filepaths and strings.
+        {
+            std::wsmatch match;
+            std::wregex  regex( L"[^\\s\']+|\'.+\'" );
+
+            while( std::regex_search( value, match, regex ) )
+            {
+                elements.emplace_back( match[ 0 ].str( ) );
+
+                value = std::regex_replace( value, regex, L"", std::regex_constants::format_first_only );
+            }
+        }
+
+
+        // Remove spaces from the start and at the ending of the filepaths.
+        {
+            std::wsmatch match;
+            std::wregex  regex( L"\'\\s*(.+\\S)\\s*\'" );
+
+            for( auto & element : elements ) if( std::regex_match( element, match, regex ) )
+            {
+                element = match[ 1 ].str( );
+
+                element.insert( element.cbegin( ), L'\'' );
+                element.insert( element.cend( ),   L'\'' );
+            }
+        }
+
+
+        // Assemble all back.
+        value.clear( );
+
+        for( auto & element : elements )
+        {
+            value.append( element );
+            value.append( L" "    );
+        }
+
+        value.pop_back( );
+    }
+
+
+    void  path( std::wstring & value )
+    {
+        std::size_t index = 0;
+        std::size_t  npos = std::wstring::npos;
+
+
+        for( index = value.find( L"\'" ); index != npos; index = value.find( L"\'" ) )
+        {
+            value.replace( index, 1, L"\"" );
+        }
+
+
+    #ifdef _WIN32
+        for( index = value.find( L"/"  ); index != npos; index = value.find( L"/"  ) )
+        {
+            value.replace( index, 1, L"\\" );
+        }
+    #endif
+    }
+
+
+    void  fold( std::wstring const & value )
+    {
+        std::wstring temp = value;
+
+        if( temp[ 0 ] == L'\'' )
+        {
+            temp.erase( 0, 1 ).pop_back( );
+        }
+
+        std::filesystem::path file = temp;
+        std::filesystem::path spot = file.parent_path( );
+
+        std::wstring dir = spot.generic_wstring( );
+
+        std::filesystem::create_directories( spot );
+    }
+
+
+    std::wstring convert_string( std::string  const & value )
+    {
+        return std::filesystem::path( value ).wstring( );
+    }
+
+
+    std::string  convert_string( std::wstring const & value )
+    {
+        return std::filesystem::path( value ).string( );
+    }
+}
 
 
 namespace moo
