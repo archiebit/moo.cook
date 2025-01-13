@@ -10,9 +10,9 @@
     },
     "files.exclude":
     {
-        "**/.gitkeep":   false,
-        "**/.gitignore": false,
-        "**/.vscode":    false,
-        "**/.github":    false
+        "**/.gitkeep":   true,
+        "**/.gitignore": true,
+        "**/.vscode":    true,
+        "**/.github":    true
     }
 }
