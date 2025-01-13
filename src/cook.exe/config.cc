@@ -74,10 +74,14 @@ namespace moo
             moo::strip( execute ), moo::path( execute );
 
 
-            // Print command and execute it.
-            std::wcout << execute << std::endl;
+            // Check if you really need to build current target.
+            if( not cache( list.front( ), list ) )
+            {
+                // Print command and execute it.
+                std::wcout << execute << std::endl;
 
-            std::system( convert_string( execute ).c_str( ) );
+                std::system( convert_string( execute ).c_str( ) );
+            }
         }
 
 
@@ -342,6 +346,64 @@ namespace moo
         if( anything ) return * anything;
 
         throw L"Cannot find fitting recipe!";
+    }
+
+
+    bool config::cache( recipe const & instance, std::list<recipe> const & list )
+    {
+        if( not instance.vars.contains( L"output" ) )
+        {
+            return false;
+        }
+
+        if( not instance.vars.contains( L"depend" ) )
+        {
+            return false;
+        }
+
+
+        std::wstring source;
+        std::wstring target = substitute_full( instance.vars.at( L"output" ), list );
+        std::wstring depend = substitute_full( instance.vars.at( L"depend" ), list );
+
+        moo::path( target ), moo::path( depend );
+
+
+        std::wsmatch match;
+        std::wregex  regex( L"[^\\s\"]+|\"[^\"]+\"" );
+
+        while( std::regex_search( depend, match, regex, std::regex_constants::format_first_only ) )
+        {
+            source = match[ 0 ].str( );
+
+            if( target[ 0 ] == L'\"' ) target.erase( 0, 1 ).pop_back( );
+            if( source[ 0 ] == L'\"' ) source.erase( 0, 1 ).pop_back( );
+
+            if( not std::filesystem::exists( target ) )
+            {
+                return false;
+            }
+
+            if( not std::filesystem::exists( source ) )
+            {
+                return false;
+            }
+
+
+            auto target_time = std::filesystem::last_write_time( target );
+            auto source_time = std::filesystem::last_write_time( source );
+
+            if( source_time > target_time )
+            {
+                return false;
+            }
+
+
+            depend = std::regex_replace( depend, regex, L"", std::regex_constants::format_first_only );
+        }
+
+
+        return true;
     }
 }
 

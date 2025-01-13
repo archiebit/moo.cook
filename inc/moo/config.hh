@@ -45,6 +45,11 @@ namespace moo
         std::list<std::wstring> prepare( std::wstring const & value, std::list<recipe> & list );
 
 
+    private:
+        // Do you really need to build that target? Call it out and find out!
+        bool cache( recipe const & instance, std::list<recipe> const & list );
+
+
     public:
         std::list<recipe> recipes;
     };
