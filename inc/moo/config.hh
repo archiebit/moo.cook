@@ -1,57 +1,45 @@
 #ifndef MOO_CONFIG_HH
 #define MOO_CONFIG_HH
 
-#include <moo/object.hh>
-#include <moo/recipe.hh>
+#include <cstdint>
+#include <string>
+#include <map>
+#include <list>
+#include <istream>
+#include <memory>
 
 
 namespace moo
 {
-    // Config contains its recipes and will try build its targets.
-    class config : public object
+    class recipe;
+
+    class config
     {
     public:
-       ~config( ) = default;
-        config( ) = default;
+       ~config( );
+        config( std::istream & source, std::size_t & line );
 
 
-    public:
-        // Build all targets.
-        void build( );
+        void append( std::istream & source, std::size_t & line );
+        bool naming( std::string const & name );
+
+
+        std::string subst( std::string const & string ) const;
+        void        subst( std::string &       string ) const;
+
+
+        recipe const & match( std::string const & target, recipe const * parent ) const;
+
+        std::string    build( std::string const & target, recipe const * parent ) const;
+        std::string    build( )                                                   const;
+
+    private:
+        void parse( std::istream & source, std::size_t & line );
 
 
     private:
-        // Build specific target.
-        std::wstring build( std::wstring const & target, std::list<recipe> & list );
-
-
-        // Splits 'list' variable into multiple strings.
-        std::list<std::wstring> create_target_list( );
-
-        // Create initial recipe chain with config in the root.
-        std::list<recipe>       create_recipe_list( );
-
-
-    private:
-        // Substitutes variable with data from the chain.
-        std::wstring substitute_full( std::wstring const & value, std::list<recipe> const & list );
-        std::wstring substitute_test( std::wstring const & value, std::list<recipe> const & list );
-
-        // Finds fitting recipe and filepath.
-        std::wstring match( std::wstring const & value, std::wstring const & pattern, std::list<recipe> const & list );
-        recipe &     match( std::wstring const & value, std::list<recipe> const & list );
-
-        // Special treatment for a 'prepare' command of the recipe.
-        std::list<std::wstring> prepare( std::wstring const & value, std::list<recipe> & list );
-
-
-    private:
-        // Do you really need to build that target? Call it out and find out!
-        bool cache( recipe const & instance, std::list<recipe> const & list );
-
-
-    public:
-        std::list<recipe> recipes;
+        std::map<std::string, std::string> variables;
+        std::list<std::unique_ptr<recipe>>   recipes;
     };
 }
 
