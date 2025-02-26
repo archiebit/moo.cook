@@ -1,40 +1,34 @@
-#include <moo/core.hh>
+#include <moo/util.hh>
 
-#include <fstream>
+#include <iostream>
 
 
 int main( int argc, char * argv[] )
 {
     try
     {
-        std::wifstream stream( L"recipe.ini" );
+        std::string file = "recipe.ini";
+        std::string name;
 
-        if( not stream.is_open( ) )
+        if( argc == 3 )
         {
-            throw L"Cannot find or open \'recipe.ini\' file!";
+            file = argv[ 1 ];
+            name = argv[ 2 ];
         }
 
-        if( argc <= 1 )
+        if( argc == 2 )
         {
-            throw L"Configuration was not provided!";
+            name = argv[ 1 ];
         }
 
-
-        for( auto & config : moo::parse( stream ) )
-        {
-            for( int i = 1; i < argc; ++i ) if( config.vars[ L"name" ] == moo::convert_string( argv[ i ] ) )
-            {
-                config.build( );
-
-                break;
-            }
-        }
+        moo::parse( file );
+        moo::build( name );
 
         return 0;
     }
-    catch( std::wstring::const_pointer message )
+    catch( std::runtime_error const & error )
     {
-        std::wcerr << message << std::endl;
+        std::cerr << error.what( ) << std::endl;
 
         return 1;
     }
