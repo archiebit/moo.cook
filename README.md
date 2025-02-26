@@ -57,8 +57,8 @@ command = "clang++ {args}"
 pattern = "<src>/(file)/*.cc"
 output  = "'<tmp>/(file)/{filename}.o'"
 inc     = "-I 'inc'"
-args    = "-c -Wall -Wextra -std=c++23"
-command = "clang++ -o {output} {args} {inc}"
+args    = "-c -Wall -Wextra -std=c++23 -ggdb"
+command = "clang++ -o {output} '<src>/(file)/{file}' {args} {inc}"
 ```
 
 
