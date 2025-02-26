@@ -52,8 +52,7 @@ command = "clang++ {args}"
 # Do you see a 'prepare' command from the above recipe?
 # It will search for all wildcarded files.
 # Then cook tool finds recipe for all those files.
-# Output of this recipe will be written in the 'src' variable
-# of its 'parent' recipe (above).
+# Output of this recipe will be written in the 'src' variable of its 'parent' recipe (above).
 [recipe]
 pattern = "<src>/(file)/*.cc"
 output  = "'<tmp>/(file)/{filename}.o'"
@@ -81,6 +80,10 @@ The value is `cook.exe`.
 
 Final look is `src/cook.exe/*.cc`.
 
+> [!IMPORTANT]
+> Is recipe doesn't contain searched variable, then search is goes to its parent.
+> This way will go to the configuration.
+
 
 ## Special recipe variables
 When cook tool finds a recipe for its target, its creates special
@@ -89,7 +92,7 @@ recipe with `cook.exe` target.
 
 Those are:
 - `filename` - Just a file name `cook`
-- `filetype` - Just a file extensions `.exe`
+- `filetype` - Just a file extension `.exe`
 - `file`     - The whole target `cook.exe`
 
 
