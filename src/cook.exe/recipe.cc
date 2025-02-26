@@ -277,7 +277,7 @@ namespace moo
 
 
         if( parent ) parent->subst( string );
-    //  if( origin ) origin->subst( string );
+        if( origin ) origin->subst( string );
     }
 
 
@@ -388,6 +388,8 @@ namespace moo
                 piece.pop_back( );
 
                 std::filesystem::create_directories( piece );
+
+                return piece;
             }
         }
 
@@ -399,11 +401,54 @@ namespace moo
             if( not piece.empty( ) )
             {
                 std::filesystem::create_directories( piece );
+
+                return piece;
             }
         }
 
 
         return piece;
+    }
+
+
+    bool                   recipe::cache( std::string const & output )
+    {
+        std::regex pathed( R"('([^']+)')" );
+        std::smatch match;
+        std::string piece = output;
+
+        if( std::regex_match( piece, match, pathed ) )
+        {
+            piece = match[ 1 ].str( );
+        }
+
+        if( not std::filesystem::exists( piece ) )
+        {
+            return false;
+        }
+
+
+        for( auto & [ name, data ] : preparations )
+        {
+            for( auto & file : ready( data ) )
+            {
+                if( std::regex_match( file, match, pathed ) )
+                {
+                    file = match[ 1 ].str( );
+                }
+
+                auto part = std::filesystem::last_write_time( file  );
+                auto curr = std::filesystem::last_write_time( piece );
+
+                if( part > curr )
+                {
+                    return false;
+                }
+            }
+        }
+
+
+        return true;
     }
 
 
@@ -460,7 +505,7 @@ namespace moo
         }
 
 
-        if( variables.contains( "command" ) )
+        if( variables.contains( "command" ) and not cache( output ) )
         {
             command = subst( const_cast<std::string const &>( variables.at( "command" ) ) );
 

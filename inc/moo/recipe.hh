@@ -41,6 +41,7 @@ namespace moo
 
     private:
         void parse( std::istream & source, std::size_t & line );
+        bool cache( std::string const & output );
 
 
     private:
