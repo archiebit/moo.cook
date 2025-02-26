@@ -81,8 +81,8 @@ The value is `cook.exe`.
 Final look is `src/cook.exe/*.cc`.
 
 > [!IMPORTANT]
-> Is recipe doesn't contain searched variable, then search is goes to its parent.
-> This way will go to the configuration.
+> If the recipe doesn't contain the variable being searched for, the search moves to its parent.
+> This procedure can go to the configuration at the end.
 
 
 ## Special recipe variables
